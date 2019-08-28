@@ -2,4 +2,14 @@
 
 <h1>{{title}}</h1>
 
+<div class="client-info">
+    <h1>Clients in the system</h1>
+    {{#clients}}
+    <section>
+    <p><strong>Full name:</strong>
+        <a href="/client/{{login}}"> {{name}} {{surname}}</p>
+    </section>
+    {{/clients}}
+</div>
+
 {{> footer}}
