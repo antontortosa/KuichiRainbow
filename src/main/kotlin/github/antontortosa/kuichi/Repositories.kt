@@ -1,5 +1,6 @@
 package github.antontortosa.kuichi
 
+import ch.qos.logback.core.net.server.Client
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Service
 import javax.transaction.Transactional
@@ -23,9 +24,9 @@ interface ClientService {
 
     fun retrieveAll(): List<ClientEntity>
 
-    fun add(client: CreateClientDto): ClientEntity
+    fun add(client: ClientEntity): ClientEntity
 
-    fun update(id: Long, client: UpdateClientDto): ClientEntity?
+    fun update(id: Long, client: ClientEntity): ClientEntity?
 
     fun retrieveByLogin(login: String): ClientEntity?
 }
@@ -48,26 +49,18 @@ internal class JpaClientService(val clientRepo: ClientRepository, val addressRep
         return clientRepo.findAll()
     }
 
-    override fun add(client: CreateClientDto) : ClientEntity {
-        val clientToAdd = ClientEntity(
-                name = client.name,
-                surname = client.surname,
-                birthDate = client.birthDate,
-                signDate = LocalDateTime.now(),
-                login = client.login,
-                address = addressRepo.getOne(client.address)
-        )
-        return clientRepo.save(clientToAdd)
+    override fun add(client: ClientEntity) : ClientEntity {
+        return clientRepo.save(client)
     }
 
-    override fun update(id: Long, client: UpdateClientDto): ClientEntity? {
+    override fun update(id: Long, client: ClientEntity): ClientEntity? {
         val currentClient  = clientRepo.findById(id).takeIf { it.isPresent }?.get()
         currentClient?.let {
             it.name = client.name?:it.name
             it.surname = client.surname?:it.surname
             it.birthDate = client.birthDate?:it.birthDate
             it.login = client.login?:it.login
-            it.address = addressRepo.findByIdOrNull(client.address)?:it.address
+            it.address = client.address?:it.address
         }
         return if (currentClient != null) clientRepo.save(currentClient) else null
     }
@@ -82,9 +75,9 @@ interface AddressService {
 
     fun retrieveAll(): List<AddressEntity>
 
-    fun add(address: CreateAddressDto): AddressEntity
+    fun add(address: AddressEntity): AddressEntity
 
-    fun update(id: Long, address: UpdateAddressDto): AddressEntity?
+    fun update(id: Long, address: AddressEntity): AddressEntity?
 }
 
 @Service
@@ -99,18 +92,11 @@ internal class JpaAddressService(val addressRepo: AddressRepository) : AddressSe
         return addressRepo.findAll()
     }
 
-    override fun add(address: CreateAddressDto) : AddressEntity {
-        val addressToAdd = AddressEntity(
-                street = address.street,
-                streetCont = address.streetCont,
-                city = address.city,
-                state = address.state,
-                zip = address.zip
-        )
-        return addressRepo.save(addressToAdd)
+    override fun add(address: AddressEntity) : AddressEntity {
+        return addressRepo.save(address)
     }
 
-    override fun update(id: Long, address: UpdateAddressDto): AddressEntity? {
+    override fun update(id: Long, address: AddressEntity): AddressEntity? {
         val currentAddress  = addressRepo.findById(id).takeIf { it.isPresent }?.get()
         currentAddress?.let {
             it.street = address.street?:it.street
@@ -132,9 +118,9 @@ interface CollectionService {
 
     fun retrieveAll(): List<CollectionEntity>
 
-    fun add(collection: CreateCollectionDto): CollectionEntity
+    fun add(collection: CollectionEntity): CollectionEntity
 
-    fun update(id: Long, collection: UpdateCollectionDto): CollectionEntity?
+    fun update(id: Long, collection: CollectionEntity): CollectionEntity?
 }
 @Service
 @Transactional
@@ -147,15 +133,11 @@ internal class JpaCollectionService(val collectionRepo: CollectionRepository):Co
     override fun retrieveAll(): List<CollectionEntity> =
             collectionRepo.findAll()
 
-    override fun add(collection: CreateCollectionDto): CollectionEntity {
-        val collectionToAdd = CollectionEntity(
-                name = collection.name,
-                description = collection.description
-        )
-        return collectionRepo.save(collectionToAdd)
+    override fun add(collection: CollectionEntity): CollectionEntity {
+        return collectionRepo.save(collection)
     }
 
-    override fun update(id: Long, collection: UpdateCollectionDto): CollectionEntity? {
+    override fun update(id: Long, collection: CollectionEntity): CollectionEntity? {
         val currentCollection  = collectionRepo.findById(id).takeIf { it.isPresent }?.get()
         currentCollection?.let {
             it.name = collection.name?:it.name
@@ -175,9 +157,9 @@ interface ItemService {
 
     fun retrieveAll(): List<ItemEntity>
 
-    fun add(item: CreateItemDto): ItemEntity
+    fun add(item: ItemEntity): ItemEntity
 
-    fun update(id: Long, client: UpdateItemDto): ItemEntity?
+    fun update(id: Long, client: ItemEntity): ItemEntity?
 }
 
 @Service
@@ -193,23 +175,17 @@ internal class JpaItemService(val itemRepo: ItemRepository,
     override fun retrieveAll(): List<ItemEntity> =
         itemRepo.findAll()
 
-    override fun add(item: CreateItemDto): ItemEntity {
-        val itemToAdd = ItemEntity(
-                price = item.price,
-                color = item.color,
-                collection = collectionRepo.findByIdOrNull(item.collection),
-                model = modelRepo.findByIdOrNull(item.model)
-        )
-        return itemRepo.save(itemToAdd)
+    override fun add(item: ItemEntity): ItemEntity {
+        return itemRepo.save(item)
     }
 
-    override fun update(id: Long, item: UpdateItemDto): ItemEntity? {
+    override fun update(id: Long, item: ItemEntity): ItemEntity? {
         val currentItem = itemRepo.findByIdOrNull(id)
         currentItem?.let {
             it.price = item.price?:it.price
             it.color = item.color?:it.color
-            it.model = modelRepo.findByIdOrNull(item.model)?:it.model
-            it.collection = collectionRepo.findByIdOrNull(item.collection)?:it.collection
+            it.model = item.model?:it.model
+            it.collection = item.collection?:it.collection
         }
         return if(currentItem!=null) itemRepo.save(currentItem) else null
     }
@@ -224,9 +200,9 @@ interface ModelService {
 
     fun retrieveAll(): List<ModelEntity>
 
-    fun add(client: CreateModelDto): ModelEntity
+    fun add(client: ModelEntity): ModelEntity
 
-    fun update(id: Long, model: UpdateModelDto): ModelEntity?
+    fun update(id: Long, model: ModelEntity): ModelEntity?
 }
 
 @Service
@@ -240,15 +216,11 @@ internal class JpaModelService(val modelRepo: ModelRepository) : ModelService {
     override fun retrieveAll(): List<ModelEntity> =
             modelRepo.findAll()
 
-    override fun add(model: CreateModelDto): ModelEntity {
-        val modelToAdd = ModelEntity(
-                name = model.name,
-                stock = model.stock
-        )
-        return modelRepo.save(modelToAdd)
+    override fun add(model: ModelEntity): ModelEntity {
+        return modelRepo.save(model)
     }
 
-    override fun update(id: Long, model: UpdateModelDto): ModelEntity? {
+    override fun update(id: Long, model: ModelEntity): ModelEntity? {
         val currentModel = modelRepo.findByIdOrNull(id)
         currentModel?.let {
             it.name = model.name?:it.name

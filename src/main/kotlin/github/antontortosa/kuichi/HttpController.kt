@@ -5,10 +5,11 @@ import org.springframework.ui.Model
 import org.springframework.ui.set
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-@Controller
+/*@Controller
 class HtmlController(private val clientService: ClientService, private val addressService: AddressService) {
 
     @GetMapping("/")
@@ -30,4 +31,13 @@ class HtmlController(private val clientService: ClientService, private val addre
         model["birthdate"] = client.birthDate ?: ""
         return "client"
     }
+}*/
+
+@RestController
+class RESTController(private val clientService: ClientService){
+    @GetMapping("/client/{login}")
+    fun getClient(@PathVariable login: String)=
+            clientService.retrieveByLogin(login)
+
+
 }

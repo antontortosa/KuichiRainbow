@@ -49,7 +49,7 @@ data class ClientEntity(
         var surname: String? = null,
         var login: String? = null,
         var birthDate: LocalDate? = null,
-        var signDate: LocalDateTime = LocalDateTime.now(),
+        var signDate: LocalDateTime? = LocalDateTime.now(),
         @ManyToOne var address: AddressEntity? = null
 ) : AbstractJpaPersistable<Long>()
 
@@ -66,8 +66,8 @@ data class AddressEntity(
 @Entity
 @Table(name = "Collection")
 data class CollectionEntity(
-        var name: String,
-        var description: String
+        var name: String?,
+        var description: String?
 ):AbstractJpaPersistable<Long>()
 
 @Entity
@@ -99,8 +99,8 @@ class AccessoriesEntity(
 @Entity
 @Table(name = "Model")
 data class ModelEntity (
-        var name: String,
-        var stock: Long
+        var name: String?,
+        var stock: Long?
 ):AbstractJpaPersistable<Long>()
 
 @Entity
