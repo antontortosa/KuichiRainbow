@@ -10,24 +10,33 @@ import java.time.Month
 class BlogConfiguration {
 
     @Bean
-    fun databaseInitializer(clientRepository: ClientRepository,
-                            addressRepository: AddressRepository) = ApplicationRunner {
+    fun databaseInitializer(clientService: ClientService,
+                            addressService: AddressService,
+                            collectionService: CollectionService,
+                            modelService: ModelService,
+                            itemService: ItemService
+    ) = ApplicationRunner {
 
-        val address1 = addressRepository.save(Address(street = "2345 My Place", street_cont = "Apt 666", city = "Chicago", state = StateEnum.IL, zip = 60616))
-        clientRepository.save(Client(
+        val address1 = addressService.add(CreateAddressDto(street = "2345 My Place", streetCont = "Apt 666", city = "Chicago", state = StateEnum.IL, zip = 60616))
+        clientService.add(CreateClientDto(
                 name = "Antonio",
                 surname = "Tortosa",
-                birthdate = LocalDate.of(1994,Month.NOVEMBER, 17),
-                address = address1,
+                birthDate = LocalDate.of(1994,Month.NOVEMBER, 17),
+                address = address1.id!!,
                 login = "antontortosa"
         ))
-        val address2 = addressRepository.save(Address(street = "123 Your Place", street_cont = "Apt 333", city = "Chicago", state = StateEnum.IL, zip = 60615))
-        clientRepository.save(Client(
+        val address2 = addressService.add(CreateAddressDto(street = "123 Your Place", streetCont = "Apt 333", city = "Chicago", state = StateEnum.IL, zip = 60615))
+        clientService.add(CreateClientDto(
                 name = "Emilia",
                 surname = "Rosales",
-                birthdate = LocalDate.of(1998,Month.JULY, 10),
-                address = address2,
+                birthDate = LocalDate.of(1998,Month.JULY, 10),
+                address = address2.id!!,
                 login = "emrose"
         ))
+
+        val collection1 = collectionService.add(CreateCollectionDto(name = "Spring19" , description = "Spring 2019 Collection"))
+        val model1 = modelService.add(CreateModelDto(name = "Earrings1", stock = 15))
+        val jewel1 = itemService.add(CreateItemDto(price = 50.0, color = ColorEnum.RED, collection = collection1.id!!, model = model1.id!!))
+
     }
 }

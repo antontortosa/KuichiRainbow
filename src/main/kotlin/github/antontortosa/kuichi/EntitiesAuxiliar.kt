@@ -7,4 +7,22 @@ enum class StateEnum {
     VA,WA,WV,WI,WY
 }
 
-fun Client.fullName():String = "${this.name} ${this.surname}"
+enum class ColorEnum (val rgb: Int){
+    RED(0xFF0000),
+    GREEN(0x00FF00),
+    BLUE(0x0000FF)
+}
+
+enum class JewelType{
+    Earrings,Necklace
+}
+
+enum class AccessoryType{
+    HairBand, Belt, Clips
+}
+
+/*
+* EXTENSIONS
+* */
+
+//fun ClientDto.fullName():String = "${this.name} ${this.surname}"

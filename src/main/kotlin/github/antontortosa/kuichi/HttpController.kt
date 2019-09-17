@@ -9,45 +9,25 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Controller
-class HtmlController(private val repository: ClientRepository) {
+class HtmlController(private val clientService: ClientService, private val addressService: AddressService) {
 
     @GetMapping("/")
     fun kuichi(model: Model): String {
         model["title"] = "Kuichi"
-        model["clients"] = repository.findAll().map { it.render() }
+        model["clients"] = clientService.retrieveAll()
         return "kuichi"
     }
 
     @GetMapping("/client/{login}")
     fun article(@PathVariable login: String, model: Model): String {
         model["title"] = "Client Info"
-        val client = repository
-                .findByLogin(login)
-                ?.render()
-                ?: throw IllegalArgumentException("Wrong article slug provided")
-        model["name"] = client.name
-        model["surname"] = client.surname
-        model["login"] = client.login
-        model["birthdate"] = client.birthdate
+        val client = clientService
+                .retrieveByLogin(login)
+                ?: throw IllegalArgumentException("Wrong login provided")
+        model["name"] = client.name ?: ""
+        model["surname"] = client.surname ?: ""
+        model["login"] = client.login ?: ""
+        model["birthdate"] = client.birthDate ?: ""
         return "client"
     }
-
-    fun Client.render() = RenderedClient(
-            name,
-            surname,
-            birthdate,
-            login,
-            signdate,
-            address
-    )
-
-
-    data class RenderedClient(
-            val name: String,
-            val surname: String,
-            val birthdate: LocalDate,
-            val login: String,
-            val signdate: LocalDateTime,
-            val addreess: Address)
-
 }
